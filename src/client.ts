@@ -19,14 +19,23 @@ export const authClient = {
   logout: () => api.post("/logout"),
 };
 
-type Document = {
+export type Document = {
   id: number;
   name: string;
   expires_at: string;
+  archived_at: string | null;
 };
 export const documentsClient = {
-  getDocuments: () => api.get<{ data: Document[] }>("/documents"),
+  getDocuments: (params?: { filter?: string; sort?: string }) =>
+    api.get<{ data: Document[] }>("/documents", {
+      params,
+    }),
   getDocument: (id: number) => api.get<{ data: Document }>(`/documents/${id}`),
+  renameDocument: (id: number, name: string) =>
+    api.patch(`/documents/${id}`, { name }),
   archiveDocument: (id: number) => api.post(`/documents/${id}/archive`),
-  createDocument: (id: number) => api.post(`/documents/${id}`),
+  createDocument: (data: FormData) =>
+    api.post("/documents", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 };
